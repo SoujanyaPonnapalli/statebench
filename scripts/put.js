@@ -18,7 +18,7 @@ const main = async (state, blockNum) => {
     const val = utils.ethAccountToRlp(data.value);
     if (state instanceof rainblock.MerklePatriciaTree) {
       state.put(key, val);
-    } else {
+    } else if (state) {
       let flag = false;
       state.put(key, val, () => {flag = true});
       wait.for.predicate(() => flag);
@@ -40,6 +40,7 @@ for (let blockNum = startBlock; blockNum <= endBlock; blockNum += interval) {
   const rstate = new rainblock.MerklePatriciaTree();
   const estate = new ethereumjs();
 
+  utils.addAsyncTest(suite, '--- ' + block, main, setup, null, blockNum);
   utils.addAsyncTest(suite, 'RBC ' + block, main, setup, rstate, blockNum);
   utils.addAsyncTest(suite, 'ETH ' + block, main, setup, estate, blockNum);
 }
