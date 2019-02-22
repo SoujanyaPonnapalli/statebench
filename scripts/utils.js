@@ -68,7 +68,7 @@ function newBenchmark () {
 }
 
 function readStateDump (blockNum) {
-  const filename = path.join(__dirname + '/../stateDumps/state_' + blockNum +'.json');
+  const filename = path.join(__dirname + '/../../stateDumps/state_' + blockNum +'.json');
   const pipeline = streamChain.chain([
     fs.createReadStream(filename),
     streamJson.parser(),
