@@ -13,9 +13,8 @@ const main = async (state, blockNum) => {
   const pipeline = utils.readStateDump(blockNum)
   for await (const data of asyncChunks(pipeline)) {
     const key = ethUtil.keccak256(Buffer.from(data.key, 'hex'));
-    const val = util.ethereumAccountToRlp(data.value);
+    const val = utils.ethAccountToRlp(data.value);
     state.put(key, val);
-    numKeys += 1;
   }
 };
 
@@ -28,8 +27,13 @@ for (let blockNum = startBlock; blockNum <= endBlock; blockNum += interval) {
   if (blockNum in skipBlocks) {
     continue;
   }
+
   const block = blockNum.toString();
-  utils.addAsyncTest(suite, 'Put RBC:' + block, main, setup, new rainblock.MerklePatriciaTree(), blockNum);
-  utils.addAsyncTest(suite, 'Put ETH:' + block, main, setup, new ethereumjs(), blockNum);  
+  const rstate = new rainblock.MerklePatriciaTree();
+  const estate = new ethereumjs();
+
+  utils.addAsyncTest(suite, 'Put RBC ' + block, main, setup, rstate, blockNum);
+  utils.addAsyncTest(suite, 'Put ETH ' + block, main, setup, estate, blockNum);
 }
+console.log("Name,\t\t", "ops/sec,", "ms/op,", "runs, errors");
 suite.run({async: true});

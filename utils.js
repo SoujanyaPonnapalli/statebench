@@ -1,12 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 const benchmark =  require('benchmark');
 const fs = require("fs-extra");
 const path = require("path");
 const Pick = require("stream-json/filters/Pick");
 const RLP = require('rlp');
 const streamChain = require("stream-chain");
+const streamJson = require("stream-json");
 const streamObject = require("stream-json/streamers/StreamObject");
 
 module.exports = {
@@ -16,7 +14,7 @@ module.exports = {
   readStateDump
 }
 
-function ethAccountToRlp () {
+function ethAccountToRlp (account) {
   let hexBalance = BigInt(`${account.balance}`).toString(16);
   
   if (hexBalance === '0') {
@@ -62,8 +60,8 @@ function newBenchmark () {
     const ops = benchmarkRun.hz.toFixed(benchmarkRun.hz < 100 ? 2 : 0);
     const err = stats.rme.toFixed(2);
   
-    console.log(`${benchmarkRun.name}: ${ops}±${err}% ops/s ${meanInMillis}±${
-        stdDevInMillis} ms/op (${runs} run${runs === 0 ? '' : 's'})`);
+    console.log(`${benchmarkRun.name}, ${ops}, ${meanInMillis}, ${runs}, \
+ ${err}%, ${stdDevInMillis}`);
   });
 
   return suite;
