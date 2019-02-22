@@ -24,6 +24,7 @@
     "fs-extra": "^7.0.1",
     "merkle-patricia-tree": "^3.0.0",
     "stream-chain": "^2.1.0",
-    "stream-json": "^1.1.4"
+    "stream-json": "^1.1.4",
+    "wait-for-stuff": "^1.4.0"
   }
 }

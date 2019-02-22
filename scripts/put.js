@@ -1,12 +1,13 @@
-const ethereumjs = require('merkle-patricia-tree');
-const rainblock = require('@rainblock/merkle-patricia-tree');
-const ethUtil = require('ethereumjs-util');
-const utils = require('./utils');
 const asyncChunks = require('async-chunks');
+const ethereumjs = require('merkle-patricia-tree');
+const ethUtil = require('ethereumjs-util');
+const rainblock = require('@rainblock/merkle-patricia-tree');
+const utils = require('./utils');
+const wait = require('wait-for-stuff');
 
-const startBlock = 100000;
+const startBlock = 1000000;
 const endBlock = 4000000;
-const interval = 100000;
+const interval = 1000000;
 const skipBlocks = [2500000, 2600000, 2700000];
 
 const main = async (state, blockNum) => {
@@ -14,11 +15,17 @@ const main = async (state, blockNum) => {
   for await (const data of asyncChunks(pipeline)) {
     const key = ethUtil.keccak256(Buffer.from(data.key, 'hex'));
     const val = utils.ethAccountToRlp(data.value);
-    state.put(key, val);
+    if (state instanceof rainblock.MerklePatriciaTree) {
+      state.put(key, val);
+    } else {
+      let flag = false;
+      state.put(key, val, () => {flag = true});
+      wait.for.predicate(() => flag);
+    }
   }
 };
 
-const setup = async () => {
+const setup = async (state, blockNum) => {
 }
 
 const suite = utils.newBenchmark();
@@ -32,8 +39,8 @@ for (let blockNum = startBlock; blockNum <= endBlock; blockNum += interval) {
   const rstate = new rainblock.MerklePatriciaTree();
   const estate = new ethereumjs();
 
-  utils.addAsyncTest(suite, 'Put RBC ' + block, main, setup, rstate, blockNum);
-  utils.addAsyncTest(suite, 'Put ETH ' + block, main, setup, estate, blockNum);
+  utils.addAsyncTest(suite, 'RBC ' + block, main, setup, rstate, blockNum);
+  utils.addAsyncTest(suite, 'ETH ' + block, main, setup, estate, blockNum);
 }
-console.log("Name,\t\t", "ops/sec,", "ms/op,", "runs, errors");
+console.log("Put Block,", "ops/sec,", "ms/op,", "runs, errors");
 suite.run({async: true});
