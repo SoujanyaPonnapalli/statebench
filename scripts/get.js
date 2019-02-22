@@ -1,3 +1,4 @@
+require('console-stamp')(console, '[HH:MM:ss.l]');
 const asyncChunks = require('async-chunks');
 const ethereumjs = require('merkle-patricia-tree');
 const ethUtil = require('ethereumjs-util');
@@ -54,5 +55,5 @@ for (let blockNum = startBlock; blockNum <= endBlock; blockNum += interval) {
   utils.addAsyncTest(suite, 'RBC ' + block, main, setup, rstate, blockNum);
   utils.addAsyncTest(suite, 'ETH ' + block, main, setup, estate, blockNum);
 }
-console.log("Put Block,", "ops/sec,", "ms/op,", "runs, errors");
+console.log("Get Block,", "ops/sec,", "ms/op,", "runs, errors");
 suite.run({async: true});

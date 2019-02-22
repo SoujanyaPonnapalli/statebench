@@ -1,3 +1,4 @@
+require('console-stamp')(console, '[HH:MM:ss.l]');
 const asyncChunks = require('async-chunks');
 const ethereumjs = require('merkle-patricia-tree');
 const ethUtil = require('ethereumjs-util');
