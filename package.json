@@ -1,0 +1,29 @@
+{
+  "name": "statebench",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoujanyaPonnapalli/statebench.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SoujanyaPonnapalli/statebench/issues"
+  },
+  "homepage": "https://github.com/SoujanyaPonnapalli/statebench#readme",
+  "dependencies": {
+    "@rainblock/merkle-patricia-tree": "^4.0.0",
+    "async-chunks": "^1.1.0",
+    "benchmark": "^2.1.4",
+    "ethereumjs-util": "^6.1.0",
+    "fs-extra": "^7.0.1",
+    "merkle-patricia-tree": "^3.0.0",
+    "stream-chain": "^2.1.0",
+    "stream-json": "^1.1.4"
+  }
+}
