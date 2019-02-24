@@ -70,6 +70,45 @@ const readFile = async (maxKeys) => {
   return els;
 }
 
+const test_memdiff_ETH = async (els) => {
+  let trees = [];
+  
+  const maxBatches = process.argv[4];
+  
+  let state = new ethereumjs();
+
+  console.log("ETH Tree addition");
+  console.log("Batch, ", "memdiff(kB), ", "memusage(MB), ", "memtotal(MB)");
+
+  let memi = process.memoryUsage().heapUsed;
+  let memf, memdiff;
+  for (let i = 0; i < maxBatches; i++) {
+       
+    let flag_ETH = false;
+    state.batch(els, () => {flag_ETH = true});
+    wait.for.predicate(() => flag_ETH);
+    trees.push(state);
+    state = new ethereumjs();
+
+    memf = process.memoryUsage().heapUsed;
+    memdiff = memf - memi;
+    memi = memf;
+    console.log(`${i}, ${(memdiff/1024).toFixed(2)}, ${(memf/(1024*1024)).toFixed(2)}, ${(process.memoryUsage().heapTotal/(1024*1024)).toFixed(2)}`);
+  }
+
+  console.log("ETH Tree removal");
+  console.log("Batch, ", "memdiff(kB), ", "memusage(MB), ", "memtotal(MB)");
+  
+  memi = process.memoryUsage().heapUsed;
+  for (let i = 0; i < maxBatches; i++) {
+    trees.shift();
+    global.gc();
+    memf = process.memoryUsage().heapUsed;
+    memdiff = memf-memi;
+    memi = memf;
+    console.log(`${i}, ${(memdiff/1024).toFixed(2)}, ${(memf/(1024*1024)).toFixed(2)}, ${(process.memoryUsage().heapTotal/(1024*1024)).toFixed(2)}`);
+  }
+}
 const test_memdiff_RBC = async (els) => {
   let trees = [];
   
@@ -110,6 +149,33 @@ const test_memdiff_RBC = async (els) => {
   }
 }
 
+const test_gctime_ETH = async (els) => {
+  let trees = [];
+  
+  const maxBatches = process.argv[4];
+  
+  let state = new ethereumjs();
+  
+  for (let i = 0; i < maxBatches; i++) {
+    let flag_ETH = false;
+    state.batch(els, () => {flag_ETH = true});
+    wait.for.predicate(() => flag_ETH);
+    trees.push(state);
+    state = new ethereumjs();
+  }
+
+  console.log("Tree removal");
+  console.log("Batch, ", "gctime");
+  
+  let start, end;
+  for (let i = 0; i < maxBatches; i++) {
+    trees.shift();
+    start = process.hrtime();
+    global.gc();
+    end = process.hrtime(start);
+    console.log(`${i}, ${end}`);
+  }
+}
 const test_gctime_RBC = async (els) => {
   let trees = [];
   
@@ -246,6 +312,31 @@ const generateStats = function() {
   stats_global.push(heapUsed);
 }
 
+const test_memgraph_ETH_batch = (els) => {
+  
+  console.log("Tree creation for ETH batch");
+  const maxKeys = process.argv[3];
+  state_global = new ethereumjs();
+
+  let flag_ETH = false;
+  state_global.batch(els, () => {flag_ETH = true});
+  wait.for.predicate(() => flag_ETH);
+
+  setInterval(generateStats, 1000);
+
+  process.on('SIGINT', function(){
+    var data = JSON.stringify(stats_global);
+    fs.writeFile("./graph/stats_ETH_batch_" + maxKeys + ".json", data, function(err) {
+      if(err) {
+        console.log(err);
+      } else {
+        flag = 0;
+        console.log("\nSaved stats");
+      }
+      process.exit();
+    });
+  });
+}
 const test_memgraph_RBC_batch = (els) => {
   
   console.log("Tree creation for batch");
@@ -257,7 +348,7 @@ const test_memgraph_RBC_batch = (els) => {
 
   process.on('SIGINT', function(){
     var data = JSON.stringify(stats_global);
-    fs.writeFile("./graph/stats_batch_" + maxKeys + ".json", data, function(err) {
+    fs.writeFile("./graph/stats_RBC_batch_" + maxKeys + ".json", data, function(err) {
       if(err) {
         console.log(err);
       } else {
@@ -280,7 +371,7 @@ const test_memgraph_RBC_batchCOW = (els) => {
 
   process.on('SIGINT', function(){
     var data = JSON.stringify(stats_global);
-    fs.writeFile("./graph/stats_batchCOW_" + maxKeys + ".json", data, function(err) {
+    fs.writeFile("./graph/stats_RBC_batchCOW_" + maxKeys + ".json", data, function(err) {
       if(err) {
         console.log(err);
       } else {
@@ -295,7 +386,7 @@ const test_memgraph_RBC_batchCOW = (els) => {
 function test() {
 
   if (process.argv.length !== 6) {
-    console.log("USAGE: node filename.js blockNumber keySize batchSize testtype");
+    console.log("USAGE: node filename.js blockNumber keySize batchSize testtype. For help, input testtype as help");
     process.exit();
   }
 
@@ -310,13 +401,19 @@ function test() {
   console.log("GCTIME block: ", process.argv[2], " keys: ", maxKeys, " batches: ", maxBatches, " test: ", type_test, " memory: ", (process.memoryUsage().heapUsed/(1024*1024)).toFixed(2), "/", (process.memoryUsage().heapTotal/(1024*1024)).toFixed(2) );
 
   switch (type_test){
-    case "memdiff":
+    case "memdiff_eth":
+      test_memdiff_ETH(els);
+      break;
+    case "memdiff_rbc":
       test_memdiff_RBC(els);
       break;
-    case "gctime":
+    case "gctime_eth":
+      test_gctime_ETH(els);
+      break;
+    case "gctime_rbc":
       test_gctime_RBC(els);
       break;
-    case "memsize":
+    case "memsize_rbc":
       test_memsize_RBC(els);
       break;
     case "memgraph_batch":
@@ -325,8 +422,11 @@ function test() {
     case "memgraph_batchCOW":
       test_memgraph_RBC_batchCOW(els);
       break;
+    case "memgraph_ETH_batch":
+      test_memgraph_ETH_batch(els);
+      break;
     default:
-      console.log("Provide correct app:\nmemdiff - Difference in memory using process.memoryUsage when adding and removing a tree\ngctime - Time taken to garbage collect all objects dereferenced by removing tree reference\nmemsize - details of node type and size added and removed in a tree\nmemgraph_batch - print heap used and delete tree formed by batch in the middle. Stop with Ctrl+C.\nmemgraph_batchCOW - print heap used and delete tree formed by batchCOW in the middle. Stop with Ctrl+C.");
+      console.log("Provide correct app:\nmemdiff(_eth/_rbc) - Difference in memory using process.memoryUsage when adding and removing a tree\ngctime(_eth/_rbc) - Time taken to garbage collect all objects dereferenced by removing tree reference\nmemsize(_rbc) - details of node type and size added and removed in a tree\nmemgraph_batch - print heap used and delete tree formed by batch in the middle. Stop with Ctrl+C.\nmemgraph_batchCOW - print heap used and delete tree formed by batchCOW in the middle. Stop with Ctrl+C.\nmemgraph_ETH_batch - for ethereumjs");
   }
 }
 
