@@ -7,18 +7,19 @@ const streamChain = require("stream-chain");
 const streamJson = require("stream-json");
 const streamObject = require("stream-json/streamers/StreamObject");
 
-export const startBlock = 100000;
-export const endBlock = 4000000;
-export const interval = 100000;
-export const skipBlocks = [2500000, 2600000, 2700000];
-export const batchSize = [100, 500, 1000]
-
 module.exports = {
   ethAccountToRlp,
   newBenchmark,
   addAsyncTest,
   readStateDump
 }
+
+module.exports.startBlock = 100000;
+module.exports.endBlock = 4000000;
+module.exports.interval = 100000;
+module.exports.skipBlocks = [2500000, 2600000, 2700000];
+module.exports.batchSize = [100, 500, 1000];
+
 
 function ethAccountToRlp (account) {
   let hexBalance = BigInt(`${account.balance}`).toString(16);
