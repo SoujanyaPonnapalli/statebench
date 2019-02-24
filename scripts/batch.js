@@ -6,10 +6,10 @@ const rainblock = require('@rainblock/merkle-patricia-tree');
 const utils = require('./utils');
 const wait = require('wait-for-stuff');
 
-const startBlock = 1000000;
+const startBlock = 100000;
 const endBlock = 4000000;
-const interval = 1000000;
-const skipBlocks = [2500000, 2600000, 2700000];
+const interval = 100000;
+const skipBlocks = [2500000, 2600000, 270000];
 const batchSize = [100, 500, 1000]
 
 const main = async (state, blockNum, batch) => {
@@ -21,7 +21,7 @@ const main = async (state, blockNum, batch) => {
     const val = utils.ethAccountToRlp(data.value);
     numKeys += 1;
     if (numKeys % batch !== 0) {
-      batchOps.push({'key': key, 'val': val});
+      batchOps.push({'key': key, 'val': val, 'value': val, 'type': 'put'});
       continue;
     }
     if (state instanceof rainblock.MerklePatriciaTree) {
@@ -40,7 +40,7 @@ const setup = async (state, blockNum, batch) => {
 
 const suite = utils.newBenchmark();
 
-for (let blockNum = startBlock; blockNum <= endBlock; blockNum += interval) {
+for (let blockNum = startBlock; blockNum < endBlock; blockNum += interval) {
   if (blockNum in skipBlocks) {
     continue;
   }
@@ -50,10 +50,10 @@ for (let blockNum = startBlock; blockNum <= endBlock; blockNum += interval) {
     const rstate = new rainblock.MerklePatriciaTree();
     const estate = new ethereumjs();
   
-    utils.addAsyncTest(suite, '--- ' + block, main, setup, null, blockNum, batch);
-    utils.addAsyncTest(suite, 'RBC ' + block, main, setup, rstate, blockNum, batch);
-    utils.addAsyncTest(suite, 'ETH ' + block, main, setup, estate, blockNum, batch);  
+    utils.addAsyncTest(suite, '--- ' + block + ' ' + batch, main, setup, null, blockNum, batch);
+    utils.addAsyncTest(suite, 'RBC ' + block + ' ' + batch, main, setup, rstate, blockNum, batch);
+    utils.addAsyncTest(suite, 'ETH ' + block + ' ' + batch, main, setup, estate, blockNum, batch);  
   }
 }
-console.log("Put Block,", "ops/sec,", "ms/op,", "runs, errors");
+console.log("Put Block Batch,", "ops/sec,", "ms/op,", "runs, errors");
 suite.run({async: true});
