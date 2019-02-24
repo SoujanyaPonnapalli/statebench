@@ -23,7 +23,9 @@
     "console-stamp": "^0.2.7",
     "ethereumjs-util": "^6.1.0",
     "fs-extra": "^7.0.1",
+    "heapdump": "^0.3.12",
     "merkle-patricia-tree": "^3.0.0",
+    "node-memwatch": "^1.0.1",
     "stream-chain": "^2.1.0",
     "stream-json": "^1.1.4",
     "wait-for-stuff": "^1.4.0"
