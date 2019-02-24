@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/SoujanyaPonnapalli/statebench#readme",
   "dependencies": {
-    "@rainblock/merkle-patricia-tree": "^4.0.0",
+    "@rainblock/merkle-patricia-tree": "https://github.com/RainBlock/merkle-patricia-tree",
     "async-chunks": "^1.1.0",
     "benchmark": "^2.1.4",
     "console-stamp": "^0.2.7",
