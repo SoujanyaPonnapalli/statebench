@@ -6,11 +6,6 @@ const rainblock = require('@rainblock/merkle-patricia-tree');
 const utils = require('./utils');
 const wait = require('wait-for-stuff');
 
-const startBlock = 1000000;
-const endBlock = 4000000;
-const interval = 1000000;
-const skipBlocks = [2500000, 2600000, 2700000];
-
 const main = async (state, blockNum) => {
   const pipeline = utils.readStateDump(blockNum)
   for await (const data of asyncChunks(pipeline)) {
@@ -31,8 +26,8 @@ const setup = async (state, blockNum) => {
 
 const suite = utils.newBenchmark();
 
-for (let blockNum = startBlock; blockNum <= endBlock; blockNum += interval) {
-  if (blockNum in skipBlocks) {
+for (let blockNum = utils.startBlock; blockNum < utils.endBlock; blockNum += utils.interval) {
+  if (blockNum in utils.skipBlocks) {
     continue;
   }
 

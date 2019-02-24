@@ -6,12 +6,6 @@ const rainblock = require('@rainblock/merkle-patricia-tree');
 const utils = require('./utils');
 const wait = require('wait-for-stuff');
 
-const startBlock = 100000;
-const endBlock = 4000000;
-const interval = 100000;
-const skipBlocks = [2500000, 2600000, 270000];
-const batchSize = [100, 500, 1000]
-
 const main = async (state, blockNum, batch) => {
   const pipeline = utils.readStateDump(blockNum)
   let numKeys = 0;
@@ -40,12 +34,12 @@ const setup = async (state, blockNum, batch) => {
 
 const suite = utils.newBenchmark();
 
-for (let blockNum = startBlock; blockNum < endBlock; blockNum += interval) {
-  if (blockNum in skipBlocks) {
+for (let blockNum = utils.startBlock; blockNum < utils.endBlock; blockNum += utils.interval) {
+  if (blockNum in utils.skipBlocks) {
     continue;
   }
 
-  for (let batch of batchSize) {
+  for (let batch of utils.batchSize) {
     const block = blockNum.toString();
     const rstate = new rainblock.MerklePatriciaTree();
     const estate = new ethereumjs();
