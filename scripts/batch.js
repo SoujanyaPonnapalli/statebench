@@ -35,7 +35,7 @@ const setup = async (state, blockNum, batch) => {
 const suite = utils.newBenchmark();
 
 for (let blockNum = utils.startBlock; blockNum < utils.endBlock; blockNum += utils.interval) {
-  if (blockNum in utils.skipBlocks) {
+  if (utils.skipBlocks.includes(blockNum)) {
     continue;
   }
 
