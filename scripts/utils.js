@@ -17,7 +17,7 @@ module.exports = {
 module.exports.startBlock = 100000;
 module.exports.endBlock = 4000000;
 module.exports.interval = 100000;
-module.exports.skipBlocks = [2500000, 2600000, 2700000];
+module.exports.skipBlocks = [2500000, 2600000, 2700000, 3000000];
 module.exports.batchSize = [100, 500, 1000];
 
 
