@@ -24,7 +24,7 @@ module.exports.skipBlocks = [2500000, 2600000, 2700000, 3000000];
 module.exports.batchSize = [100, 500, 1000];
 
 
-const generateStandardTree = (state, rounds, batchSize) => {
+function generateStandardTree (state, rounds, batchSize) {
   let seed = Buffer.alloc(32, 0);
   let batchOps = [];
   for (let i = 1; i <= rounds; i++) {
