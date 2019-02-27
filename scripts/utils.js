@@ -8,6 +8,8 @@ const streamJson = require("stream-json");
 const streamObject = require("stream-json/streamers/StreamObject");
 const rainblock = require('@rainblock/merkle-patricia-tree');
 const wait = require('wait-for-stuff');
+const hashAsBuffer = require('bigint-hash').hashAsBuffer;
+const HashType = require('bigint-hash').HashType;
 
 module.exports = {
   ethAccountToRlp,
