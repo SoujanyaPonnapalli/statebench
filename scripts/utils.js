@@ -13,7 +13,8 @@ module.exports = {
   ethAccountToRlp,
   newBenchmark,
   addAsyncTest,
-  readStateDump
+  readStateDump,
+  generateStandardTree
 }
 
 module.exports.startBlock = 100000;
