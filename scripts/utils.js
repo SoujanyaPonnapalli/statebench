@@ -44,7 +44,7 @@ function generateStandardTree (state, rounds, batchSize) {
         let flag = false;
         state.batch(batchOps, () => {flag = true});
         wait.for.predicate(() => flag);
-        seed = tree.root;
+        seed = state.root;
         batchOps = [];
       }
     }
