@@ -6,6 +6,8 @@ const RLP = require('rlp');
 const streamChain = require("stream-chain");
 const streamJson = require("stream-json");
 const streamObject = require("stream-json/streamers/StreamObject");
+const rainblock = require('@rainblock/merkle-patricia-tree');
+const wait = require('wait-for-stuff');
 
 module.exports = {
   ethAccountToRlp,
@@ -20,6 +22,31 @@ module.exports.interval = 100000;
 module.exports.skipBlocks = [2500000, 2600000, 2700000, 3000000];
 module.exports.batchSize = [100, 500, 1000];
 
+
+const generateStandardTree = (state, rounds, batchSize) => {
+  let seed = Buffer.alloc(32, 0);
+  let batchOps = [];
+  for (let i = 1; i <= rounds; i++) {
+    seed = hashAsBuffer(HashType.KECCAK256, seed);
+    batchOps.push({
+      key: seed,
+      val: hashAsBuffer(HashType.KECCAK256, seed),
+      value: hashAsBuffer(HashType.KECCAK256, seed),
+      type: 'put'
+    });
+    if (i % batchSize === 0) {
+      if (state instanceof rainblock.MerklePatriciaTree) {
+        seed = tree.batch(batchOps);
+      } else if (state) {
+        let flag = false;
+        tree.batch(batchOps, () => {flag = true});
+        wait.for.predicate(() => flag);
+        seed = tree.root;
+        batchOps = [];
+      }
+    }
+  }
+};
 
 function ethAccountToRlp (account) {
   let hexBalance = BigInt(`${account.balance}`).toString(16);
