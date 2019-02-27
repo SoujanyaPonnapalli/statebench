@@ -39,10 +39,10 @@ function generateStandardTree (state, rounds, batchSize) {
     });
     if (i % batchSize === 0) {
       if (state instanceof rainblock.MerklePatriciaTree) {
-        seed = tree.batch(batchOps);
+        seed = state.batch(batchOps);
       } else if (state) {
         let flag = false;
-        tree.batch(batchOps, () => {flag = true});
+        state.batch(batchOps, () => {flag = true});
         wait.for.predicate(() => flag);
         seed = tree.root;
         batchOps = [];
