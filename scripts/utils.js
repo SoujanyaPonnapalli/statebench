@@ -25,9 +25,8 @@ module.exports.interval = 100000;
 module.exports.skipBlocks = [2500000, 2600000, 2700000, 3000000];
 module.exports.batchSize = [100, 500, 1000];
 
-
 function generateStandardTree (state, rounds, batchSize) {
-  let seed = Buffer.alloc(32, 0);
+  let seed = Buffer.alloc(32, 0 + Math.floor(Math.random() * (9)));
   let batchOps = [];
   for (let i = 1; i <= rounds; i++) {
     seed = hashAsBuffer(HashType.KECCAK256, seed);
@@ -38,17 +37,9 @@ function generateStandardTree (state, rounds, batchSize) {
       type: 'put'
     });
     if (i % batchSize === 0) {
-      if (state instanceof rainblock.MerklePatriciaTree) {
-        seed = state.batch(batchOps);
-      } else if (state) {
-        let flag = false;
-        state.batch(batchOps, () => {flag = true});
-        wait.for.predicate(() => flag);
-        seed = state.root;
-      }
-      batchOps = [];
     }
   }
+  return batchOps;
 };
 
 function ethAccountToRlp (account) {
